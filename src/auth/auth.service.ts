@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AuthDto } from './dto';
+import { LoginDto, SignupDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -16,10 +16,9 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  async signup({ dto }: { dto: AuthDto }) {
+  async signup({ dto }: { dto: SignupDto }) {
     const hash = await argon.hash(dto.password);
 
-    // Check if email is already taken
     const existingUser = await this.userModel
       .findOne({ email: dto.email })
       .exec();
@@ -27,10 +26,10 @@ export class AuthService {
       throw new ForbiddenException('Credentials taken');
     }
 
-    // Create new user
     const createdUser = new this.userModel({
       email: dto.email,
-      password: hash, // assuming 'password' field stores the hashed password
+      name: dto.name,
+      password: hash,
     });
     await createdUser.save();
 
@@ -40,7 +39,7 @@ export class AuthService {
     });
   }
 
-  async login({ dto }: { dto: AuthDto }) {
+  async login({ dto }: { dto: LoginDto }) {
     const user = await this.userModel.findOne({ email: dto.email }).exec();
     if (!user) throw new ForbiddenException('Credentials incorrect');
 
