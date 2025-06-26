@@ -20,37 +20,6 @@ export class InfoLocalized {
 export const InfoLocalizedSchema = SchemaFactory.createForClass(InfoLocalized);
 
 @Schema()
-export class Task {
-  @Prop() task: string;
-}
-export const TaskSchema = SchemaFactory.createForClass(Task);
-
-@Schema()
-export class ExperienceInfo {
-  @Prop() position: string;
-  @Prop({ type: [TaskSchema] }) tasks: Task[];
-}
-export const ExperienceInfoSchema =
-  SchemaFactory.createForClass(ExperienceInfo);
-
-@Schema()
-export class ActivePeriod {
-  @Prop() startDate: string;
-  @Prop() endDate: string;
-}
-export const ActivePeriodSchema = SchemaFactory.createForClass(ActivePeriod);
-
-@Schema()
-export class Experience {
-  @Prop() companyName: string;
-  @Prop() companyLogo: string;
-  @Prop() comapnyUrl: string;
-  @Prop({ type: ActivePeriodSchema }) activePeriod: ActivePeriod;
-  @Prop({ type: ExperienceInfoSchema }) info: ExperienceInfo;
-}
-export const ExperienceSchema = SchemaFactory.createForClass(Experience);
-
-@Schema()
 export class Cv {
   @Prop() cvEn?: string;
   @Prop() cvEs?: string;
@@ -85,6 +54,5 @@ export class User {
     string,
     InfoLocalized
   >;
-  @Prop({ type: [ExperienceSchema] }) experiences: Experience[];
 }
 export const UserSchema = SchemaFactory.createForClass(User);
