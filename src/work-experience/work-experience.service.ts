@@ -21,7 +21,6 @@ export class WorkExperienceService {
     if (!Types.ObjectId.isValid(userId)) {
       throw new BadRequestException('Invalid userId');
     }
-    console.log(this.workExperienceModel.find().lean());
 
     const data = await this.workExperienceModel
       .findOne({ userId: new Types.ObjectId(userId) })
