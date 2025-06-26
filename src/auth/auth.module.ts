@@ -13,8 +13,8 @@ import { AuthController } from './auth.controller';
   imports: [
     JwtModule.register({}),
     ConfigModule,
-    UserModule, // still needed for UserService
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), // ✅ this is what you’re missing
+    UserModule,
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
