@@ -35,10 +35,6 @@ export class WorkExperienceService {
       info: exp.info?.[lang] || {},
     }));
 
-    return {
-      _id: data._id,
-      userId: data.userId,
-      experiences: modifiedExperiences,
-    };
+    return modifiedExperiences;
   }
 }
