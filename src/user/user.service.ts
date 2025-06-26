@@ -6,10 +6,13 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User, UserDocument } from './schemas/user.schema';
+import { InfoLocalized, User, UserDocument } from './schemas/user.schema';
 
 type UserWithoutPassword = Omit<User, 'password'>;
 
+export type LocalizedUser = Omit<User, 'password' | 'info'> & {
+  info: InfoLocalized;
+};
 @Injectable()
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
@@ -22,10 +25,7 @@ export class UserService {
     });
   }
 
-  async findByIdWithLanguage(
-    id: string,
-    lang: string,
-  ): Promise<UserWithoutPassword> {
+  async findByIdWithLanguage(id: string, lang: string): Promise<LocalizedUser> {
     const user = await this.userModel.findById(id, { password: 0 }).lean();
 
     if (!user) {
@@ -41,6 +41,15 @@ export class UserService {
       );
     }
 
-    return user as UserWithoutPassword;
+    const localizedInfo = user.info?.[lang];
+
+    if (!localizedInfo) {
+      throw new NotFoundException(`Localized info for '${lang}' not found`);
+    }
+
+    return {
+      ...user,
+      info: user.info[lang],
+    } as LocalizedUser;
   }
 }
