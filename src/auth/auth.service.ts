@@ -5,8 +5,8 @@ import { LoginDto, SignupDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { User, UserDocument } from 'src/user/schemas/user.schema';
 import { Types } from 'mongoose';
+import { User, UserDocument } from '../user/schemas/user.schema';
 
 @Injectable()
 export class AuthService {
