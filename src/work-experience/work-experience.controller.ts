@@ -7,7 +7,7 @@ import { ApiKeyGuard } from 'src/guards/api-key.guard';
 export class WorkExperienceController {
   constructor(private readonly service: WorkExperienceService) {}
 
-  @Get(':lan/:userId')
+  @Get(':lang/:userId')
   async getLocalizedExperience(
     @Param('lang') lang: string,
     @Param('userId') userId: string,

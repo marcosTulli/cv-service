@@ -1,21 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type UserDocument = User & Document;
 
 @Schema()
 export class LanguageInfo {
-  @Prop() language: string;
-  @Prop() level: string;
-  @Prop() flag: string;
+  @Prop({ required: true }) language: string;
+  @Prop({ required: true }) level: string;
+  @Prop({ required: true }) flag: string;
 }
 export const LanguageInfoSchema = SchemaFactory.createForClass(LanguageInfo);
 
 @Schema()
 export class InfoLocalized {
-  @Prop() candidateTitle: string;
-  @Prop() about: string;
-  @Prop({ type: [LanguageInfoSchema] }) languages: LanguageInfo[];
+  @Prop({ required: true }) candidateTitle: string;
+  @Prop({ required: true }) about: string;
+  @Prop({ type: [LanguageInfoSchema], default: [], required: true })
+  languages: LanguageInfo[];
 }
 export const InfoLocalizedSchema = SchemaFactory.createForClass(InfoLocalized);
 
@@ -28,31 +29,44 @@ export const CvSchema = SchemaFactory.createForClass(Cv);
 
 @Schema()
 export class NetworkLink {
-  @Prop() display: string;
-  @Prop() url: string;
+  @Prop({ required: true }) display: string;
+  @Prop({ required: true }) url: string;
 }
 export const NetworkLinkSchema = SchemaFactory.createForClass(NetworkLink);
 
 @Schema()
 export class Network {
-  @Prop({ type: NetworkLinkSchema }) linkedin: NetworkLink;
-  @Prop({ type: NetworkLinkSchema }) github: NetworkLink;
+  @Prop({ type: NetworkLinkSchema, required: true })
+  linkedin: NetworkLink;
+
+  @Prop({ type: NetworkLinkSchema, required: true })
+  github: NetworkLink;
 }
 export const NetworkSchema = SchemaFactory.createForClass(Network);
 
 @Schema({ collection: 'Users' })
 export class User {
+  _id?: Types.ObjectId;
   @Prop({ required: true }) name: string;
-  @Prop({ required: false }) password: string;
+
+  @Prop() password?: string;
+
   @Prop({ required: true, unique: true }) email: string;
-  @Prop() phone: string;
-  @Prop() location: string;
-  @Prop([String]) availableLanguages: string[];
-  @Prop({ type: [CvSchema] }) cvs: Cv[];
-  @Prop({ type: NetworkSchema }) network: Network;
-  @Prop({ type: Map, of: InfoLocalizedSchema }) info: Record<
-    string,
-    InfoLocalized
-  >;
+
+  @Prop({ required: true }) phone: string;
+
+  @Prop({ required: true }) location: string;
+
+  @Prop({ type: [String], default: [], required: true })
+  availableLanguages: string[];
+
+  @Prop({ type: [CvSchema], default: [] })
+  cvs: Cv[];
+
+  @Prop({ type: NetworkSchema, required: true })
+  network: Network;
+
+  @Prop({ type: Map, of: InfoLocalizedSchema, required: true, default: {} })
+  info: Record<string, InfoLocalized>;
 }
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -24,7 +24,7 @@ export class UserController {
   async findByIdWithLanguage(
     @Param('lang') lang: string,
     @Param('id') id: string,
-  ): Promise<Omit<User, 'password'>> {
+  ): Promise<Omit<User, 'password' | 'info'>> {
     if (!lang) {
       throw new BadRequestException('Parameter "lang" is required');
     }

@@ -5,8 +5,7 @@ import { LoginDto, SignupDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { User, UserDocument } from 'src/user/schemas/user.schema';
-import { Types } from 'mongoose';
+import { User, UserDocument } from '../user/schemas/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -34,7 +33,7 @@ export class AuthService {
     await createdUser.save();
 
     return this.signToken({
-      userId: (createdUser._id as Types.ObjectId).toString(),
+      userId: createdUser._id.toString(),
       email: createdUser.email,
     });
   }
@@ -43,11 +42,13 @@ export class AuthService {
     const user = await this.userModel.findOne({ email: dto.email }).exec();
     if (!user) throw new ForbiddenException('Credentials incorrect');
 
-    const pwMatches = await argon.verify(user.password, dto.password);
+    const pwMatches = user.password
+      ? await argon.verify(user.password, dto.password)
+      : false;
     if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
 
     return this.signToken({
-      userId: (user._id as Types.ObjectId).toString(),
+      userId: user._id.toString(),
       email: user.email,
     });
   }

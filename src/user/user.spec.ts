@@ -1,30 +1,50 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
-import { UserService } from './user.service';
+import { Types } from 'mongoose';
+import { UserService, LocalizedUser } from './user.service';
 import { User } from './schemas/user.schema';
-import { Model } from 'mongoose';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
-const mockUsers = [
-  {
-    _id: 'user1',
-    name: 'Alice',
-    email: 'alice@example.com',
-    password: 'hashedpwd',
-    availableLanguages: ['en', 'es'],
+const mockUserId = new Types.ObjectId().toString();
+
+const mockUser: User = {
+  name: 'Test User',
+  email: 'test@example.com',
+  phone: '123-456-7890',
+  location: 'Test City',
+  availableLanguages: ['en', 'es'],
+  cvs: [{ cvEn: 'cv_en_path', cvEs: 'cv_es_path' }],
+  network: {
+    linkedin: { display: 'LinkedIn Profile', url: 'https://linkedin.com/test' },
+    github: { display: 'GitHub Profile', url: 'https://github.com/test' },
   },
-  {
-    _id: 'user2',
-    name: 'Bob',
-    email: 'bob@example.com',
-    password: 'anotherpwd',
-    availableLanguages: ['en'],
+  info: {
+    en: {
+      candidateTitle: 'Software Engineer (EN)',
+      about: 'About me in English.',
+      languages: [
+        { language: 'English', level: 'Native', flag: '🇬🇧' },
+        { language: 'Spanish', level: 'Intermediate', flag: '🇪🇸' },
+      ],
+    },
+    es: {
+      candidateTitle: 'Ingeniero de Software (ES)',
+      about: 'Sobre mí en Español.',
+      languages: [
+        { language: 'Español', level: 'Nativo', flag: '🇪🇸' },
+        { language: 'Inglés', level: 'Avanzado', flag: '🇬🇧' },
+      ],
+    },
   },
-];
+  password: 'hashedpassword123',
+};
 
 describe('UserService', () => {
   let service: UserService;
-  let model: Model<User>;
+  let userModel: {
+    find: jest.Mock;
+    findById: jest.Mock;
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -33,9 +53,7 @@ describe('UserService', () => {
         {
           provide: getModelToken(User.name),
           useValue: {
-            find: jest.fn().mockReturnValue({
-              lean: jest.fn().mockResolvedValue(mockUsers),
-            }),
+            find: jest.fn(),
             findById: jest.fn(),
           },
         },
@@ -43,72 +61,97 @@ describe('UserService', () => {
     }).compile();
 
     service = module.get<UserService>(UserService);
-    model = module.get<Model<User>>(getModelToken(User.name));
+    userModel = module.get(getModelToken(User.name));
+    jest.clearAllMocks();
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
   });
 
   describe('findAll', () => {
-    it('should return all users without passwords', async () => {
+    it('should return an array of users without passwords', async () => {
+      const leanMock = jest.fn().mockResolvedValue([mockUser]);
+      userModel.find.mockReturnValue({ lean: leanMock });
+
       const result = await service.findAll();
-      expect(result).toEqual([
-        {
-          _id: 'user1',
-          name: 'Alice',
-          email: 'alice@example.com',
-          availableLanguages: ['en', 'es'],
-        },
-        {
-          _id: 'user2',
-          name: 'Bob',
-          email: 'bob@example.com',
-          availableLanguages: ['en'],
-        },
-      ]);
+
+      expect(userModel.find).toHaveBeenCalled();
+      expect(leanMock).toHaveBeenCalled();
+      expect(result).toHaveLength(1);
+      expect(result[0]).not.toHaveProperty('password');
+      expect(result[0].name).toEqual(mockUser.name);
+    });
+
+    it('should return an empty array if no users are found', async () => {
+      const leanMock = jest.fn().mockResolvedValue([]);
+      userModel.find.mockReturnValue({ lean: leanMock });
+
+      const result = await service.findAll();
+
+      expect(userModel.find).toHaveBeenCalled();
+      expect(result).toEqual([]);
     });
   });
 
   describe('findByIdWithLanguage', () => {
-    it('should return user without password if language is available', async () => {
-      const user = {
-        _id: 'user1',
-        name: 'Alice',
-        email: 'alice@example.com',
-        availableLanguages: ['en', 'es'],
-        // no password included!
-      };
+    it('should return a localized user when user and language exist', async () => {
+      const userCopy = { ...mockUser };
+      delete userCopy.password;
 
-      const findByIdMock = jest.fn().mockReturnValue({
-        lean: jest.fn().mockResolvedValue(user),
+      const leanMock = jest.fn().mockResolvedValue(userCopy);
+      userModel.findById.mockReturnValue({ lean: leanMock });
+
+      const result: LocalizedUser = await service.findByIdWithLanguage(
+        mockUserId,
+        'en',
+      );
+
+      expect(userModel.findById).toHaveBeenCalledWith(mockUserId, {
+        password: 0,
       });
+      expect(result.email).toEqual(mockUser.email);
+      expect(result.info).toEqual(mockUser.info.en);
+    });
 
-      (model.findById as jest.Mock).mockImplementation(findByIdMock);
-
-      const result = await service.findByIdWithLanguage('user1', 'es');
-      expect(result).toEqual(user);
+    it('should throw BadRequestException if userId is invalid', async () => {
+      await expect(
+        service.findByIdWithLanguage('invalid_id', 'en'),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw NotFoundException if user is not found', async () => {
-      const findByIdMock = jest.fn().mockReturnValue({
-        lean: jest.fn().mockResolvedValue(null),
-      });
-      (model.findById as jest.Mock).mockImplementation(findByIdMock);
+      const leanMock = jest.fn().mockResolvedValue(null);
+      userModel.findById.mockReturnValue({ lean: leanMock });
 
       await expect(
-        service.findByIdWithLanguage('nonexistent', 'en'),
+        service.findByIdWithLanguage(mockUserId, 'en'),
       ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw BadRequestException if language is not supported', async () => {
-      const user = {
-        ...mockUsers[1],
-      };
-      const findByIdMock = jest.fn().mockReturnValue({
-        lean: jest.fn().mockResolvedValue(user),
+      const leanMock = jest.fn().mockResolvedValue({
+        ...mockUser,
+        availableLanguages: ['en'],
       });
-      (model.findById as jest.Mock).mockImplementation(findByIdMock);
+      userModel.findById.mockReturnValue({ lean: leanMock });
 
-      await expect(service.findByIdWithLanguage('user2', 'es')).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        service.findByIdWithLanguage(mockUserId, 'fr'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw NotFoundException if localized info for language not found', async () => {
+      const leanMock = jest.fn().mockResolvedValue({
+        ...mockUser,
+        availableLanguages: ['en', 'de'],
+        info: { en: mockUser.info.en }, // no 'de'
+      });
+      userModel.findById.mockReturnValue({ lean: leanMock });
+
+      await expect(
+        service.findByIdWithLanguage(mockUserId, 'de'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });
