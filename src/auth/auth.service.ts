@@ -43,7 +43,9 @@ export class AuthService {
     const user = await this.userModel.findOne({ email: dto.email }).exec();
     if (!user) throw new ForbiddenException('Credentials incorrect');
 
-    const pwMatches = await argon.verify(user.password, dto.password);
+    const pwMatches = user.password
+      ? await argon.verify(user.password, dto.password)
+      : false;
     if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
 
     return this.signToken({
