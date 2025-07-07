@@ -3,6 +3,13 @@ import { Document, Types } from 'mongoose';
 
 export type UserDocument = User & Document;
 
+export enum Roles {
+  GUEST = 'GUEST',
+  ADMIN = 'ADMIN',
+}
+
+export type Role = Roles;
+
 @Schema()
 export class LanguageInfo {
   @Prop({ required: true }) language: string;
@@ -68,5 +75,8 @@ export class User {
 
   @Prop({ type: Map, of: InfoLocalizedSchema, required: true, default: {} })
   info: Record<string, InfoLocalized>;
+
+  @Prop({ required: true, enum: Roles, default: Roles.GUEST })
+  role: Role;
 }
 export const UserSchema = SchemaFactory.createForClass(User);

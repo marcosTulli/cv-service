@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, StrategyOptionsWithoutRequest } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose'; // ✅ Add this
+import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Request } from 'express';
-import { User, UserDocument } from 'src/user/schemas/user.schema'; // ✅ Add User
+import { User, UserDocument } from 'src/user/schemas/user.schema';
 
 interface JwtPayload {
   sub: string;
@@ -17,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private config: ConfigService,
 
-    @InjectModel(User.name) // ✅ Add this decorator
+    @InjectModel(User.name)
     private userModel: Model<UserDocument>,
   ) {
     const options: StrategyOptionsWithoutRequest = {

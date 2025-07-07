@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// user.service.ts
+
 import {
   BadRequestException,
   Injectable,
@@ -6,24 +9,25 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { InfoLocalized, User, UserDocument } from './schemas/user.schema';
-
-type UserWithoutPassword = Omit<User, 'password'>;
+import { UserResponse, UsersResponse } from './dto';
 
 export type LocalizedUser = Omit<User, 'password' | 'info'> & {
   info: InfoLocalized;
 };
-
 @Injectable()
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async findAll(): Promise<UserWithoutPassword[]> {
+  async findAll(): Promise<UsersResponse[]> {
     const users = await this.userModel.find().lean();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return users.map(({ password, ...rest }) => rest as UserWithoutPassword);
+
+    return users.map(({ password, _id, ...rest }) => ({
+      _id: _id?.toString() ?? '',
+      ...rest,
+    }));
   }
 
-  async findByIdWithLanguage(id: string, lang: string): Promise<LocalizedUser> {
+  async findByIdWithLanguage(id: string, lang: string): Promise<UserResponse> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid user ID format');
     }
@@ -48,9 +52,12 @@ export class UserService {
       throw new NotFoundException(`Localized info for '${lang}' not found`);
     }
 
+    const { _id, info, ...rest } = user;
+
     return {
-      ...user,
+      _id: _id?.toString() ?? '',
       info: localizedInfo,
-    } as LocalizedUser;
+      ...rest,
+    };
   }
 }

@@ -1,11 +1,15 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { LoginDto, SignupDto } from './dto';
+import { LoginDto, SignupDto, changePasswordDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { User, UserDocument } from '../user/schemas/user.schema';
+import { Roles, User, UserDocument } from '../user/schemas/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -50,17 +54,49 @@ export class AuthService {
     return this.signToken({
       userId: user._id.toString(),
       email: user.email,
+      role: user.role,
+    });
+  }
+
+  async changePassword({ dto }: { dto: changePasswordDto }) {
+    const user = await this.userModel.findOne({ email: dto.email }).exec();
+    if (!user) throw new ForbiddenException('Credentials incorrect');
+
+    const pwMatches = user.password
+      ? user.password === dto.old_password
+      : false;
+    if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
+
+    const hashedNewPassword = await argon.hash(dto.new_password);
+
+    if (dto.old_password === dto.new_password) {
+      throw new BadRequestException(
+        'New password must be different from the old password',
+      );
+    }
+    user.password = hashedNewPassword;
+    await user.save();
+
+    return this.signToken({
+      userId: user._id.toString(),
+      email: user.email,
     });
   }
 
   async signToken({
     userId,
     email,
+    role,
   }: {
     userId: string;
     email: string;
+    role?: Roles;
   }): Promise<{ access_token: string }> {
-    const payload = { sub: userId, email };
+    const payload: Record<string, string | Roles> = { sub: userId, email };
+    if (role) {
+      payload.role = role;
+    }
+
     const secret: string = this.config.get('JWT_SECRET') ?? '';
     const token = await this.jwt.signAsync(payload, {
       expiresIn: '15m',
