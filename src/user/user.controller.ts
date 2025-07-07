@@ -9,7 +9,10 @@ import { UserService } from './user.service';
 import { User } from './schemas/user.schema';
 import { Types } from 'mongoose';
 import { ApiKeyGuard } from 'src/guards/api-key.guard';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('users')
+@ApiSecurity('ApiKeyAuth')
 @UseGuards(ApiKeyGuard)
 @Controller('users')
 export class UserController {

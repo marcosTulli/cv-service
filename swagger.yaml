@@ -1,0 +1,454 @@
+oopenapi: 3.0.3
+info:
+  title: My API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /users:
+    get:
+      summary: Get all users
+      tags:
+        - Users
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Create a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateDto'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/{id}:
+    get:
+      summary: Get user by ID
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+components:
+  schemas:
+    LanguageInfo:
+      type: object
+      required:
+        - language
+        - level
+        - flag
+      properties:
+        language:
+          type: string
+          example: English
+        level:
+          type: string
+          example: Fluent
+        flag:
+          type: string
+          example: "🇺🇸"
+    InfoLocalized:
+      type: object
+      required:
+        - candidateTitle
+        - about
+        - languages
+      properties:
+        candidateTitle:
+          type: string
+          example: Software Engineer
+        about:
+          type: string
+          example: Experienced developer with 5 years in NestJS
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageInfo'
+    Cv:
+      type: object
+      properties:
+        cvEn:
+          type: string
+          nullable: true
+          example: "https://example.com/cv-en.pdf"
+        cvEs:
+          type: string
+          nullable: true
+          example: "https://example.com/cv-es.pdf"
+    NetworkLink:
+      type: object
+      required:
+        - display
+        - url
+      properties:
+        display:
+          type: string
+          example: LinkedIn
+        url:
+          type: string
+          format: uri
+          example: "https://linkedin.com/in/username"
+    Network:
+      type: object
+      required:
+        - linkedin
+        - github
+      properties:
+        linkedin:
+          $ref: '#/components/schemas/NetworkLink'
+        github:
+          $ref: '#/components/schemas/NetworkLink'
+    User:
+      type: object
+      required:
+        - name
+        - email
+        - phone
+        - location
+        - availableLanguages
+        - network
+        - info
+        - role
+      properties:
+        _id:
+          type: string
+          example: "60c72b2f9b1d8e6f88e4c123"
+        name:
+          type: string
+          example: "John Doe"
+        password:
+          type: string
+          nullable: true
+          example: "hashedpassword123"
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+        phone:
+          type: string
+          example: "+1234567890"
+        location:
+          type: string
+          example: "New York"
+        availableLanguages:
+          type: array
+          items:
+            type: string
+          example: ["en", "es"]
+        cvs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cv'
+        network:
+          $ref: '#/components/schemas/Network'
+        info:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/InfoLocalized'
+        role:
+          type: string
+          enum: [GUEST, ADMIN]
+          example: GUEST
+    UserCreateDto:
+      type: object
+      required:
+        - name
+        - email
+        - phone
+        - location
+        - availableLanguages
+        - network
+        - info
+        - role
+        - password
+      properties:
+        name:
+          type: string
+          example: "John Doe"
+        password:
+          type: string
+          example: "securepassword"
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+        phone:
+          type: string
+          example: "+1234567890"
+        location:
+          type: string
+          example: "New York"
+        availableLanguages:
+          type: array
+          items:
+            type: string
+          example: ["en", "es"]
+        cvs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cv'
+        network:
+          $ref: '#/components/schemas/Network'
+        info:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/InfoLocalized'
+        role:
+          type: string
+          enum: [GUEST, ADMIN]
+          example: GUEST
+penapi: 3.0.3
+info:
+  title: My API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /users:
+    get:
+      summary: Get all users
+      tags:
+        - Users
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Create a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateDto'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/{id}:
+    get:
+      summary: Get user by ID
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+components:
+  schemas:
+    LanguageInfo:
+      type: object
+      required:
+        - language
+        - level
+        - flag
+      properties:
+        language:
+          type: string
+          example: English
+        level:
+          type: string
+          example: Fluent
+        flag:
+          type: string
+          example: "🇺🇸"
+    InfoLocalized:
+      type: object
+      required:
+        - candidateTitle
+        - about
+        - languages
+      properties:
+        candidateTitle:
+          type: string
+          example: Software Engineer
+        about:
+          type: string
+          example: Experienced developer with 5 years in NestJS
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageInfo'
+    Cv:
+      type: object
+      properties:
+        cvEn:
+          type: string
+          nullable: true
+          example: "https://example.com/cv-en.pdf"
+        cvEs:
+          type: string
+          nullable: true
+          example: "https://example.com/cv-es.pdf"
+    NetworkLink:
+      type: object
+      required:
+        - display
+        - url
+      properties:
+        display:
+          type: string
+          example: LinkedIn
+        url:
+          type: string
+          format: uri
+          example: "https://linkedin.com/in/username"
+    Network:
+      type: object
+      required:
+        - linkedin
+        - github
+      properties:
+        linkedin:
+          $ref: '#/components/schemas/NetworkLink'
+        github:
+          $ref: '#/components/schemas/NetworkLink'
+    User:
+      type: object
+      required:
+        - name
+        - email
+        - phone
+        - location
+        - availableLanguages
+        - network
+        - info
+        - role
+      properties:
+        _id:
+          type: string
+          example: "60c72b2f9b1d8e6f88e4c123"
+        name:
+          type: string
+          example: "John Doe"
+        password:
+          type: string
+          nullable: true
+          example: "hashedpassword123"
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+        phone:
+          type: string
+          example: "+1234567890"
+        location:
+          type: string
+          example: "New York"
+        availableLanguages:
+          type: array
+          items:
+            type: string
+          example: ["en", "es"]
+        cvs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cv'
+        network:
+          $ref: '#/components/schemas/Network'
+        info:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/InfoLocalized'
+        role:
+          type: string
+          enum: [GUEST, ADMIN]
+          example: GUEST
+    UserCreateDto:
+      type: object
+      required:
+        - name
+        - email
+        - phone
+        - location
+        - availableLanguages
+        - network
+        - info
+        - role
+        - password
+      properties:
+        name:
+          type: string
+          example: "John Doe"
+        password:
+          type: string
+          example: "securepassword"
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+        phone:
+          type: string
+          example: "+1234567890"
+        location:
+          type: string
+          example: "New York"
+        availableLanguages:
+          type: array
+          items:
+            type: string
+          example: ["en", "es"]
+        cvs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cv'
+        network:
+          $ref: '#/components/schemas/Network'
+        info:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/InfoLocalized'
+        role:
+          type: string
+          enum: [GUEST, ADMIN]
+          example: GUEST
