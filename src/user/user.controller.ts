@@ -5,11 +5,11 @@ import {
   BadRequestException,
   UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { User } from './schemas/user.schema';
 import { Types } from 'mongoose';
 import { ApiKeyGuard } from 'src/guards/api-key.guard';
-import { ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiSecurity, ApiTags, ApiOkResponse, ApiParam } from '@nestjs/swagger';
+import { UserService } from './user.service';
+import { UserResponse, UsersResponse } from './dto';
 
 @ApiTags('users')
 @ApiSecurity('ApiKeyAuth')
@@ -19,15 +19,19 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  async findAll(): Promise<Omit<User, 'password'>[]> {
+  @ApiOkResponse({ type: [UsersResponse] })
+  async findAll(): Promise<UsersResponse[]> {
     return this.userService.findAll();
   }
 
   @Get(':lang/:id')
+  @ApiParam({ name: 'lang', required: true })
+  @ApiParam({ name: 'id', required: true })
+  @ApiOkResponse({ type: UserResponse })
   async findByIdWithLanguage(
     @Param('lang') lang: string,
     @Param('id') id: string,
-  ): Promise<Omit<User, 'password' | 'info'>> {
+  ): Promise<UserResponse> {
     if (!lang) {
       throw new BadRequestException('Parameter "lang" is required');
     }

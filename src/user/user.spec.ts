@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
-import { UserService, LocalizedUser } from './user.service';
-import { User } from './schemas/user.schema';
+import { UserService } from './user.service';
+import { Roles, User } from './schemas/user.schema';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { UserResponse } from './dto';
 
 const mockUserId = new Types.ObjectId().toString();
 
@@ -37,6 +38,7 @@ const mockUser: User = {
     },
   },
   password: 'hashedpassword123',
+  role: Roles.ADMIN,
 };
 
 describe('UserService', () => {
@@ -102,7 +104,7 @@ describe('UserService', () => {
       const leanMock = jest.fn().mockResolvedValue(userCopy);
       userModel.findById.mockReturnValue({ lean: leanMock });
 
-      const result: LocalizedUser = await service.findByIdWithLanguage(
+      const result: UserResponse = await service.findByIdWithLanguage(
         mockUserId,
         'en',
       );
