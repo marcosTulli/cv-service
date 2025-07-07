@@ -1,7 +1,8 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { WorkExperienceService } from './work-experience.service';
 import { ApiKeyGuard } from 'src/guards/api-key.guard';
-import { ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { WorkExperienceDto } from './dto';
 
 @ApiTags('work-experience')
 @ApiSecurity('ApiKeyAuth')
@@ -10,6 +11,7 @@ import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 export class WorkExperienceController {
   constructor(private readonly service: WorkExperienceService) {}
 
+  @ApiOkResponse({ type: WorkExperienceDto })
   @Get(':lang/:userId')
   async getLocalizedExperience(
     @Param('lang') lang: string,
