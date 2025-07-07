@@ -1,144 +1,224 @@
+# NestJS CV API
 
-# API Documentation
+A comprehensive RESTful API built with NestJS for managing user profiles, CVs, work experience, education, skills, and more. This application provides a robust backend solution for portfolio and CV management systems with multilingual support.
 
-## Overview
+## 🚀 Features
 
-This API provides endpoints for managing users, authentication, work experience, education, skills, and icons. It is built with NestJS and MongoDB, with security enforced by API key guarding.
+- **User Management**: Complete user CRUD operations with role-based access
+- **Authentication**: JWT-based authentication with secure login/signup
+- **Profile Management**: Comprehensive profile management with multilingual support
+- **Work Experience**: Track and manage work history
+- **Education**: Educational background management
+- **Skills**: Skills and competencies tracking
+- **Icons**: Icon management system
+- **API Documentation**: Interactive Swagger documentation
+- **Security**: API key authentication and JWT guards
+- **Database**: MongoDB integration with Mongoose ODM
 
----
+## 🛠️ Tech Stack
 
-## Table of Contents
+- **Framework**: NestJS
+- **Database**: MongoDB with Mongoose
+- **Authentication**: JWT (JSON Web Tokens)
+- **Documentation**: Swagger/OpenAPI 3.0
+- **Language**: TypeScript
+- **Package Manager**: Yarn
+- **Testing**: Jest
 
-- [Setup](#setup)  
-- [Authentication](#authentication)  
-- [API Endpoints](#api-endpoints)  
-- [Error Handling](#error-handling)  
-- [Usage](#usage)
+## 📋 Prerequisites
 
----
+- Node.js (v22.14.0 or higher)
+- MongoDB instance
+- Yarn package manager
 
-## Setup
+## 🔧 Installation
 
-### Prerequisites
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd nestjs-cv-api
+   ```
 
-- Node.js V22.14.0
-- MongoDB instance (local or cloud)  
-- API Key for accessing endpoints
+2. **Install dependencies**
+   ```bash
+   yarn install
+   ```
 
-### Environment Variables
+3. **Environment Setup**
+   Create a `.env` file in the root directory:
+   ```env
+   PORT=8080
+   MONGO_URL=mongodb://localhost:27017
+   DB_NAME=CVDB
+   JWT_SECRET=your-super-secret-jwt-key
+   API_KEY=your-api-key-here
+   ```
 
-Set up the following in your `.env` file:
+4. **Start the application**
+   ```bash
+   # Development
+   yarn start:dev
+   
+   # Production
+   yarn build
+   yarn start:prod
+   ```
 
-```env
-MONGO_URL=your_mongodb_connection_string
-DB_NAME=your_database_name
-API_KEY=your_api_key_here
+## 🌐 API Documentation
+
+Once the application is running, you can access the interactive Swagger documentation at:
+
+**http://localhost:8080/api**
+
+This provides a complete overview of all available endpoints, request/response schemas, and allows you to test the API directly from the browser.
+
+## 📁 Project Structure
+
+```
+src/
+├── app.module.ts              # Main application module
+├── main.ts                    # Application entry point
+├── auth/                      # Authentication module
+│   ├── auth.controller.ts     # Auth endpoints
+│   ├── auth.service.ts        # Auth business logic
+│   ├── auth.module.ts         # Auth module configuration
+│   ├── dto/                   # Data transfer objects
+│   ├── guard/                 # JWT guards
+│   └── strategy/              # JWT strategy
+├── user/                      # User management
+│   ├── user.controller.ts     # User endpoints
+│   ├── user.service.ts        # User business logic
+│   ├── user.module.ts         # User module
+│   ├── dto/                   # User DTOs
+│   └── schemas/               # User MongoDB schemas
+├── work-experience/           # Work experience management
+├── education/                 # Education management
+├── skills/                    # Skills management
+├── icons/                     # Icons management
+└── guards/                    # Global guards (API key)
 ```
 
-### Install dependencies
+## 🔐 Authentication
 
-```bash
-npm install
-```
+The API uses two authentication methods:
 
-### Run the server
+1. **JWT Authentication**: For user-specific operations
+2. **API Key Authentication**: For general API access
 
-```bash
-npm run start
-```
+### JWT Authentication
+- Login endpoint: `POST /auth/login`
+- Signup endpoint: `POST /auth/signup`
+- Include JWT token in Authorization header: `Bearer <token>`
 
-The server will start on port `3000` by default.
+### API Key Authentication
+- Include API key in header: `x-api-key: <your-api-key>`
 
----
+## 📊 Available Endpoints
 
-## Authentication
-
-All API endpoints are protected with an API key. You must include an `x-api-key` header in your requests:
-
-```
-x-api-key: your_api_key_here
-```
-
----
-
-## API Endpoints
-
-### Auth
-
-| Method | Endpoint    | Description      | Body                     |
-|--------|-------------|------------------|--------------------------|
-| POST   | `/auth/signup` | Register a new user | `{ email, name, password }` |
-| POST   | `/auth/login`  | Login a user      | `{ email, password }`       |
-
----
+### Authentication
+- `POST /auth/signup` - User registration
+- `POST /auth/login` - User login
+- `PATCH /auth/change-password` - Change user password
 
 ### Users
-
-| Method | Endpoint          | Description                       |
-|--------|-------------------|---------------------------------|
-| GET    | `/users`          | Get all users (without passwords) |
-| GET    | `/users/:lang/:id`| Get user data localized by language (excluding password & info) |
-
----
+- `GET /users` - Get all users
+- `GET /users/:id` - Get user by ID
 
 ### Work Experience
-
-| Method | Endpoint                  | Description                      |
-|--------|---------------------------|--------------------------------|
-| GET    | `/work-experience/:lang/:userId` | Get work experience localized by language for a user |
-
----
+- `GET /work-experience` - Get work experience
 
 ### Education
-
-| Method | Endpoint                  | Description                      |
-|--------|---------------------------|--------------------------------|
-| GET    | `/education/:lang/:userId`| Get education data localized by language for a user |
-
----
+- `GET /education` - Get education records
 
 ### Skills
-
-| Method | Endpoint          | Description                      |
-|--------|-------------------|--------------------------------|
-| GET    | `/skills/:userId` | Get skills for a user (language-dependent) |
-
----
+- `GET /skills` - Get skills
 
 ### Icons
+- `GET /icons` - Get icons
 
-| Method | Endpoint      | Description                  |
-|--------|---------------|------------------------------|
-| GET    | `/icons/:name`| Get icon data by icon name    |
-
----
-
-## Error Handling
-
-- Requests missing required parameters will return a `400 Bad Request`.
-- Invalid MongoDB ObjectIds will return a `400 Bad Request`.
-- Missing or invalid API keys will result in a `401 Unauthorized` response.
-
----
-
-## Usage Example
-
-Using `curl` to get all users:
+## 🧪 Testing
 
 ```bash
-curl -H "x-api-key: your_api_key_here" http://localhost:3000/users
+# Unit tests
+yarn test
+
+# E2E tests
+yarn test:e2e
+
+# Test coverage
+yarn test:cov
 ```
 
-Logging in a user:
+## 🚀 Development Commands
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -H "x-api-key: your_api_key_here" -d '{"email":"test@example.com","password":"mypassword"}' http://localhost:3000/auth/login
+# Start development server
+yarn start:dev
+
+# Build for production
+yarn build
+
+# Start production server
+yarn start:prod
+
+# Lint code
+yarn lint
+
+# Format code
+yarn format
 ```
 
----
+## 🌍 Multilingual Support
 
-## Notes
+The API supports multilingual content through the `InfoLocalized` schema, allowing users to provide information in multiple languages:
 
-- All responses are JSON.
-- Passwords are never returned in API responses.
-- Language codes (`lang`) follow ISO 639-1 standards (e.g., `en`, `es`, `fr`).
+- English (`en`)
+- Spanish (`es`)
+- Additional languages can be configured
+
+## 📝 Data Models
+
+### User Schema
+- Personal information (name, email, phone, location)
+- Available languages
+- CV documents (multiple language versions)
+- Social network links
+- Role-based access (GUEST, ADMIN)
+
+### Work Experience Schema
+- Company information
+- Position details
+- Duration and responsibilities
+- Multilingual descriptions
+
+### Education Schema
+- Institution details
+- Degree information
+- Duration and achievements
+
+### Skills Schema
+- Skill categories
+- Proficiency levels
+- Associated icons
+
+## 🔒 Security Features
+
+- JWT token-based authentication
+- API key validation
+- Role-based access control
+- Password hashing
+- CORS enabled
+- Input validation with DTOs
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
