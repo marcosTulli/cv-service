@@ -9,7 +9,7 @@ import { LoginDto, SignupDto, changePasswordDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { User, UserDocument } from '../user/schemas/user.schema';
+import { Roles, User, UserDocument } from '../user/schemas/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -54,6 +54,7 @@ export class AuthService {
     return this.signToken({
       userId: user._id.toString(),
       email: user.email,
+      role: user.role,
     });
   }
 
@@ -85,11 +86,17 @@ export class AuthService {
   async signToken({
     userId,
     email,
+    role,
   }: {
     userId: string;
     email: string;
+    role?: Roles;
   }): Promise<{ access_token: string }> {
-    const payload = { sub: userId, email };
+    const payload: Record<string, string | Roles> = { sub: userId, email };
+    if (role) {
+      payload.role = role;
+    }
+
     const secret: string = this.config.get('JWT_SECRET') ?? '';
     const token = await this.jwt.signAsync(payload, {
       expiresIn: '15m',
