@@ -9,7 +9,21 @@
   "buildCommand": "npm run build:vercel",
   "routes": [
     {
-      "src": "/docs(.*)",
+      "src": "/docs",
+      "headers": {
+        "Cache-Control": "s-maxage=1, stale-while-revalidate"
+      },
+      "dest": "/dist/public/swagger-ui/index.html"
+    },
+    {
+      "src": "/docs/(.*)",
+      "headers": {
+        "Cache-Control": "s-maxage=1, stale-while-revalidate"
+      },
+      "dest": "/dist/public/swagger-ui/$1"
+    },
+    {
+      "src": "/docs-json",
       "dest": "/api/index.ts"
     },
     {
