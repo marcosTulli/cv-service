@@ -5,7 +5,7 @@ import { AppModule } from './app.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { config } from './swagger.config';
 import { OpenAPIObject } from '@nestjs/swagger';
-
+// test
 export async function createNestApplication() {
   const server = express();
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
