@@ -6,10 +6,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
-import { ApiKeyGuard } from 'src/guards/api-key.guard';
 import { ApiSecurity, ApiTags, ApiOkResponse, ApiParam } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UserResponse, UsersResponse } from './dto';
+import { ApiKeyGuard } from '../guards/api-key.guard';
 
 @ApiTags('users')
 @ApiSecurity('ApiKeyAuth')
