@@ -7,6 +7,8 @@ import { WorkExperienceModule } from './work-experience/work-experience.module';
 import { EducationModule } from './education/education.module';
 import { SkillsModule } from './skills/skills.module';
 import { IconsModule } from './icons/icons.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -26,5 +28,7 @@ import { IconsModule } from './icons/icons.module';
     SkillsModule,
     IconsModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
