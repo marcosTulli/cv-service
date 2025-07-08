@@ -3,14 +3,6 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "deleteOutDir": true,
-    "assets": [
-      {
-        "include": "../node_modules/swagger-ui-dist/**/*",
-        "outDir": "./dist/public/swagger-ui",
-        "watchAssets": true
-      }
-    ],
-    "watchAssets": true
+    "deleteOutDir": true
   }
 }
