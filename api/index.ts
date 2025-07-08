@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createNestApplication } from '../dist/src/main.serverless'; // ✅ Correct path
+import { createNestApplication } from '../src/main.serverless';
 import type { Express } from 'express';
 import type { IncomingMessage, ServerResponse } from 'http';
 
@@ -14,6 +15,7 @@ let cachedApp: Express | undefined;
 function isResponseSent(res: VercelResponse): boolean {
   return res.headersSent || res.writableEnded;
 }
+
 function sendErrorResponse(
   res: VercelResponse,
   statusCode: number,
@@ -51,9 +53,7 @@ export default async function handler(
       const expressReq = req as unknown as IncomingMessage;
       const expressRes = res as unknown as ServerResponse;
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       (expressReq as any).requestId = requestId;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       (expressReq as any).timestamp = new Date().toISOString();
 
       const expressApp = cachedApp as unknown as (
