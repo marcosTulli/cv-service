@@ -7,7 +7,7 @@
     "assets": [
       {
         "include": "../node_modules/swagger-ui-dist/**/*",
-        "outDir": "./dist/public/swagger-ui",
+        "outDir": "public/swagger-ui",
         "watchAssets": true
       }
     ],
