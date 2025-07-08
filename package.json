@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "build:vercel": "nest build && cp -R node_modules/@nestjs/swagger/node_modules/swagger-ui-dist public/swagger-ui",
+    "build:vercel": "npm run build && cp -R node_modules/swagger-ui-dist public/swagger-ui",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

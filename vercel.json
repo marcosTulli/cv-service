@@ -6,6 +6,7 @@
       "maxDuration": 30
     }
   },
+  "buildCommand": "yarn build:vercel",
   "routes": [
     {
       "src": "/docs/(.*)",
