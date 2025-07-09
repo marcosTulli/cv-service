@@ -16,6 +16,10 @@ export async function createNestApplication() {
     res.json(document);
   });
 
+  server.get('/docs/swagger.json', (req: Request, res: Response) => {
+    res.json(document);
+  });
+
   app.enableCors();
   await app.init();
   return server;

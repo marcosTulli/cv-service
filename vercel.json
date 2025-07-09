@@ -9,22 +9,20 @@
   "buildCommand": "yarn build:vercel",
   "routes": [
     {
-      "src": "/docs",
-      "headers": {
-        "Cache-Control": "s-maxage=1, stale-while-revalidate"
-      },
-      "dest": "/dist/public/swagger-ui/index.html"
-    },
-    {
-      "src": "/docs/(.*)",
-      "headers": {
-        "Cache-Control": "s-maxage=1, stale-while-revalidate"
-      },
-      "dest": "/dist/public/swagger-ui/$1"
+      "src": "/docs/swagger.json",
+      "dest": "/api/index.ts"
     },
     {
       "src": "/docs-json",
       "dest": "/api/index.ts"
+    },
+    {
+      "src": "/docs/(.*)",
+      "dest": "/dist/public/swagger-ui/$1"
+    },
+    {
+      "src": "/docs",
+      "dest": "/dist/public/swagger-ui/index.html"
     },
     {
       "src": "/(.*)",
