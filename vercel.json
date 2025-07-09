@@ -14,11 +14,11 @@
     },
     {
       "src": "/docs$",
-      "dest": "/swagger-ui/index.html"
+      "dest": "/dist/public/swagger-ui/index.html"
     },
     {
       "src": "/docs/(.*)",
-      "dest": "/swagger-ui/$1"
+      "dest": "/dist/public/swagger-ui/$1"
     },
     {
       "src": "/(.*)",

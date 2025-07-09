@@ -18,4 +18,8 @@ if (fs.existsSync(initializerPath)) {
   fs.writeFileSync(initializerPath, content);
 }
 
-console.log('Build completed with public directory created');
+const distPublicDir = path.join(process.cwd(), 'dist', 'public', 'swagger-ui');
+fs.mkdirSync(distPublicDir, { recursive: true });
+execSync(`cpx 'public/swagger-ui/**/*' dist/public/swagger-ui`, {
+  stdio: 'inherit',
+});
