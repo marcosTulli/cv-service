@@ -6,24 +6,8 @@
       "maxDuration": 30
     }
   },
-  "buildCommand": "yarn build:vercel",
+  "buildCommand": "yarn build",
   "routes": [
-    {
-      "src": "/docs/swagger.json",
-      "dest": "/api/index.ts"
-    },
-    {
-      "src": "/docs-json",
-      "dest": "/api/index.ts"
-    },
-    {
-      "src": "/docs/(.*)",
-      "dest": "/dist/public/swagger-ui/$1"
-    },
-    {
-      "src": "/docs",
-      "dest": "/dist/public/swagger-ui/index.html"
-    },
     {
       "src": "/(.*)",
       "dest": "/api/index.ts"

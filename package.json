@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "build:vercel": "yarn build && cpx 'node_modules/swagger-ui-dist/**/*' dist/public/swagger-ui && sed -i 's|url: \".*\"|url: \"/docs-json\"|g' dist/public/swagger-ui/swagger-initializer.js",
+    "build:vercel": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
