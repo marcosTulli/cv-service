@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsArray, ValidateNested } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsArray, ValidateNested, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SkillsContentDto {
@@ -30,4 +30,38 @@ export class SkillsDto {
   @ValidateNested({ each: true })
   @Type(() => SkillsContentDto)
   skills: SkillsContentDto[];
+}
+
+export class CreateSkillDto {
+  @ApiProperty()
+  @IsString()
+  name: string;
+
+  @ApiProperty()
+  @IsString()
+  formattedName: string;
+}
+
+export class UpdateSkillDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  formattedName?: string;
+}
+
+export class SkillNameDto {
+  @ApiProperty()
+  @IsString()
+  name: string;
+}
+
+export class SkillFormattedNameDto {
+  @ApiProperty()
+  @IsString()
+  formattedName: string;
 }
