@@ -1,5 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsArray, ValidateNested, IsObject } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsString,
+  IsArray,
+  ValidateNested,
+  IsObject,
+  IsOptional,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class TaskDto {
@@ -74,4 +80,92 @@ export class WorkExperienceDto {
   @ValidateNested({ each: true })
   @Type(() => ExperienceDto)
   experiences: ExperienceDto[];
+}
+
+export class CreateExperienceDto {
+  @ApiProperty()
+  @IsString()
+  companyName: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  companyLogo?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  comapnyUrl?: string;
+
+  @ApiPropertyOptional({ type: ActivePeriodDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ActivePeriodDto)
+  activePeriod?: ActivePeriodDto;
+
+  @ApiPropertyOptional({
+    description: 'Localized info with language codes as keys',
+    example: {
+      en: { position: 'Developer', tasks: [{ task: 'Coding' }] },
+    },
+    type: Object,
+  })
+  @IsOptional()
+  @IsObject()
+  info?: Record<string, ExperienceInfoDto>;
+}
+
+export class UpdateExperienceDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  companyName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  companyLogo?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  comapnyUrl?: string;
+
+  @ApiPropertyOptional({ type: ActivePeriodDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ActivePeriodDto)
+  activePeriod?: ActivePeriodDto;
+
+  @ApiPropertyOptional({
+    description: 'Localized info with language codes as keys',
+    type: Object,
+  })
+  @IsOptional()
+  @IsObject()
+  info?: Record<string, ExperienceInfoDto>;
+}
+
+export class CompanyNameDto {
+  @ApiProperty()
+  @IsString()
+  companyName: string;
+}
+
+export class ComapnyUrlDto {
+  @ApiProperty()
+  @IsString()
+  comapnyUrl: string;
+}
+
+export class UpdateActivePeriodDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  startDate?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  endDate?: string;
 }
