@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { EducationService } from './education.service';
 import { ApiKeyGuard } from 'src/guards/api-key.guard';
+import { OwnerOnly } from 'src/guards/owner.guard';
 import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import {
   CreateEducationDto,
@@ -36,6 +37,7 @@ export class EdcuationController {
     return this.service.findByUserIdWithLang(lang, userId);
   }
 
+  @OwnerOnly()
   @Post(':userId')
   async createEducation(
     @Param('userId') userId: string,
@@ -44,6 +46,7 @@ export class EdcuationController {
     return this.service.createEducation(userId, dto);
   }
 
+  @OwnerOnly()
   @Patch(':userId/:educationId')
   async updateEducation(
     @Param('userId') userId: string,
@@ -53,6 +56,7 @@ export class EdcuationController {
     return this.service.updateEducation(userId, educationId, dto);
   }
 
+  @OwnerOnly()
   @Delete(':userId/:educationId')
   async deleteEducation(
     @Param('userId') userId: string,
@@ -61,6 +65,7 @@ export class EdcuationController {
     return this.service.deleteEducation(userId, educationId);
   }
 
+  @OwnerOnly()
   @Post(':userId/:educationId/url')
   async createUrl(
     @Param('userId') userId: string,
@@ -70,6 +75,7 @@ export class EdcuationController {
     return this.service.createUrl(userId, educationId, dto);
   }
 
+  @OwnerOnly()
   @Patch(':userId/:educationId/url')
   async updateUrl(
     @Param('userId') userId: string,
@@ -79,6 +85,7 @@ export class EdcuationController {
     return this.service.updateUrl(userId, educationId, dto);
   }
 
+  @OwnerOnly()
   @Delete(':userId/:educationId/url')
   async deleteUrl(
     @Param('userId') userId: string,
@@ -87,6 +94,7 @@ export class EdcuationController {
     return this.service.deleteUrl(userId, educationId);
   }
 
+  @OwnerOnly()
   @Post(':userId/:educationId/translations/:lang')
   async createTranslation(
     @Param('userId') userId: string,
@@ -97,6 +105,7 @@ export class EdcuationController {
     return this.service.createTranslation(userId, educationId, lang, dto);
   }
 
+  @OwnerOnly()
   @Patch(':userId/:educationId/translations/:lang')
   async updateTranslation(
     @Param('userId') userId: string,
@@ -107,6 +116,7 @@ export class EdcuationController {
     return this.service.updateTranslation(userId, educationId, lang, dto);
   }
 
+  @OwnerOnly()
   @Delete(':userId/:educationId/translations/:lang')
   async deleteTranslation(
     @Param('userId') userId: string,

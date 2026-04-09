@@ -23,6 +23,7 @@ import {
   UsersResponse,
 } from './dto';
 import { ApiKeyGuard } from '../guards/api-key.guard';
+import { OwnerOnly } from '../guards/owner.guard';
 
 @ApiTags('users')
 @ApiSecurity('ApiKeyAuth')
@@ -56,6 +57,7 @@ export class UserController {
     return this.userService.findByIdWithLanguage(id, lang);
   }
 
+  @OwnerOnly()
   @Post(':userId/info/:lang')
   async createInfoLocalized(
     @Param('userId') userId: string,
@@ -65,6 +67,7 @@ export class UserController {
     return this.userService.createInfoLocalized(userId, lang, dto);
   }
 
+  @OwnerOnly()
   @Patch(':userId/info/:lang')
   async updateInfoLocalized(
     @Param('userId') userId: string,
@@ -74,6 +77,7 @@ export class UserController {
     return this.userService.updateInfoLocalized(userId, lang, dto);
   }
 
+  @OwnerOnly()
   @Delete(':userId/info/:lang')
   async deleteInfoLocalized(
     @Param('userId') userId: string,
@@ -82,6 +86,7 @@ export class UserController {
     return this.userService.deleteInfoLocalized(userId, lang);
   }
 
+  @OwnerOnly()
   @Post(':userId/info/:lang/languages')
   async createLanguageInfo(
     @Param('userId') userId: string,
@@ -91,6 +96,7 @@ export class UserController {
     return this.userService.createLanguageInfo(userId, lang, dto);
   }
 
+  @OwnerOnly()
   @Patch(':userId/info/:lang/languages/:language')
   async updateLanguageInfo(
     @Param('userId') userId: string,
@@ -101,6 +107,7 @@ export class UserController {
     return this.userService.updateLanguageInfo(userId, lang, language, dto);
   }
 
+  @OwnerOnly()
   @Delete(':userId/info/:lang/languages/:language')
   async deleteLanguageInfo(
     @Param('userId') userId: string,
@@ -110,6 +117,7 @@ export class UserController {
     return this.userService.deleteLanguageInfo(userId, lang, language);
   }
 
+  @OwnerOnly()
   @Post(':userId/network/:name')
   async createNetworkLink(
     @Param('userId') userId: string,
@@ -119,6 +127,7 @@ export class UserController {
     return this.userService.createNetworkLink(userId, name, dto);
   }
 
+  @OwnerOnly()
   @Patch(':userId/network/:name')
   async updateNetworkLink(
     @Param('userId') userId: string,
@@ -128,6 +137,7 @@ export class UserController {
     return this.userService.updateNetworkLink(userId, name, dto);
   }
 
+  @OwnerOnly()
   @Delete(':userId/network/:name')
   async deleteNetworkLink(
     @Param('userId') userId: string,
