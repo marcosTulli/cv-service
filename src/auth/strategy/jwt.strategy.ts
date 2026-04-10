@@ -34,7 +34,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super(options);
   }
 
-  async validate(payload: JwtPayload): Promise<UserDocument | null> {
+  async validate(payload: JwtPayload) {
     const user = await this.userModel
       .findById(payload.sub, { password: 0 })
       .lean();
