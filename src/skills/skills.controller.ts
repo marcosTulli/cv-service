@@ -6,12 +6,10 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import { SkillsService } from './skills.service';
-import { ApiKeyGuard } from 'src/guards/api-key.guard';
-import { OwnerOnly } from 'src/guards/owner.guard';
-import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { OwnerOnly } from '../guards/owner.guard';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateSkillDto,
   SkillFormattedNameDto,
@@ -21,8 +19,6 @@ import {
 } from './dto';
 
 @ApiTags('skills')
-@ApiSecurity('ApiKeyAuth')
-@UseGuards(ApiKeyGuard)
 @Controller('skills')
 export class SkillsController {
   constructor(private readonly service: SkillsService) {}

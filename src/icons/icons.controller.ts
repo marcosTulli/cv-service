@@ -1,12 +1,9 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { ApiKeyGuard } from 'src/guards/api-key.guard';
+import { Controller, Get, Param } from '@nestjs/common';
 import { IconsService } from './icons.service';
-import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { IconsDto } from './dto';
 
 @ApiTags('icons')
-@ApiSecurity('ApiKeyAuth')
-@UseGuards(ApiKeyGuard)
 @Controller('icons')
 export class IconsController {
   constructor(private readonly service: IconsService) {}

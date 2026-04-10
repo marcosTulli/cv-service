@@ -10,7 +10,7 @@ import {
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
-import { ApiKeyGuard } from 'src/guards/api-key.guard';
+import { ApiKeyGuard } from '../guards/api-key.guard';
 import { changePasswordDto } from './dto';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 

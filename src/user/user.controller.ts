@@ -7,10 +7,9 @@ import {
   Patch,
   Post,
   BadRequestException,
-  UseGuards,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
-import { ApiSecurity, ApiTags, ApiOkResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOkResponse, ApiParam } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import {
   CreateInfoLocalizedDto,
@@ -22,12 +21,9 @@ import {
   UserResponse,
   UsersResponse,
 } from './dto';
-import { ApiKeyGuard } from '../guards/api-key.guard';
 import { OwnerOnly } from '../guards/owner.guard';
 
 @ApiTags('users')
-@ApiSecurity('ApiKeyAuth')
-@UseGuards(ApiKeyGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}

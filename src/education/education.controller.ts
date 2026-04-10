@@ -6,12 +6,10 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import { EducationService } from './education.service';
-import { ApiKeyGuard } from 'src/guards/api-key.guard';
-import { OwnerOnly } from 'src/guards/owner.guard';
-import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { OwnerOnly } from '../guards/owner.guard';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateEducationDto,
   EducationDto,
@@ -22,8 +20,6 @@ import {
 } from './dto';
 
 @ApiTags('education')
-@ApiSecurity('ApiKeyAuth')
-@UseGuards(ApiKeyGuard)
 @Controller('education')
 export class EdcuationController {
   constructor(private readonly service: EducationService) {}

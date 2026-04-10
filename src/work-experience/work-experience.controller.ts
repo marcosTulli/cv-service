@@ -6,12 +6,10 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import { WorkExperienceService } from './work-experience.service';
-import { ApiKeyGuard } from 'src/guards/api-key.guard';
-import { OwnerOnly } from 'src/guards/owner.guard';
-import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { OwnerOnly } from '../guards/owner.guard';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import {
   ActivePeriodDto,
   CompanyNameDto,
@@ -23,8 +21,6 @@ import {
 } from './dto';
 
 @ApiTags('work-experience')
-@ApiSecurity('ApiKeyAuth')
-@UseGuards(ApiKeyGuard)
 @Controller('work-experience')
 export class WorkExperienceController {
   constructor(private readonly service: WorkExperienceService) {}

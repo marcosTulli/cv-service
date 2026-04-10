@@ -9,8 +9,9 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Types } from 'mongoose';
-import { Roles } from 'src/user/schemas/user.schema';
-import JwtGuard from 'src/auth/guard/jwt.guard';
+import { Roles } from '../user/schemas/user.schema';
+import JwtGuard from '../auth/guard/jwt.guard';
+import { ApiKeyGuard } from './api-key.guard';
 
 interface AuthenticatedUser {
   _id?: Types.ObjectId | string;
@@ -50,4 +51,5 @@ export class OwnerGuard implements CanActivate {
   }
 }
 
-export const OwnerOnly = () => applyDecorators(UseGuards(JwtGuard, OwnerGuard));
+export const OwnerOnly = () =>
+  applyDecorators(UseGuards(ApiKeyGuard, JwtGuard, OwnerGuard));
