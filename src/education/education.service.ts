@@ -40,33 +40,32 @@ export class EducationService {
       throw new NotFoundException('Education content not found');
     }
 
-    const modifiedData = data.education.map((i) => {
-      const localized = i[lang] as EducationLocalizedContent;
-
-      if (!localized || typeof localized !== 'object') {
-        throw new NotFoundException(
-          `Education content not found in language: ${lang}`,
-        );
-      }
-
-      return {
-        id: i._id,
-        url: i.url,
-        title: localized.title,
-        content: localized.content,
-      };
-    });
+    const modifiedData = data.education
+      .filter((i) => {
+        const localized = i[lang];
+        return localized && typeof localized === 'object';
+      })
+      .map((i) => {
+        const localized = i[lang] as EducationLocalizedContent;
+        return {
+          id: i._id,
+          url: i.url,
+          title: localized.title,
+          content: localized.content,
+        };
+      });
 
     return modifiedData;
   }
 
   async createEducation(userId: string, dto: CreateEducationDto) {
     const userObjectId = this.toUserObjectId(userId);
-    const entry: EducationContent = {
-      _id: new Types.ObjectId().toString(),
+    const entryId = new Types.ObjectId();
+    const entry = {
+      _id: entryId,
       ...(dto.url !== undefined ? { url: dto.url } : {}),
       ...(dto.translations ?? {}),
-    } as EducationContent;
+    };
 
     const updated = await this.educationModel.findOneAndUpdate(
       { userId: userObjectId },
@@ -77,7 +76,7 @@ export class EducationService {
       { new: true, upsert: true },
     );
 
-    return this.findEntryInDoc(updated.education, entry._id);
+    return this.findEntryInDoc(updated.education, entryId.toString());
   }
 
   async updateEducation(
@@ -101,10 +100,12 @@ export class EducationService {
       throw new BadRequestException('No fields to update');
     }
 
+    const educationObjectId = new Types.ObjectId(educationId);
+
     const updated = await this.educationModel.findOneAndUpdate(
       {
         userId: userObjectId,
-        'education._id': educationId,
+        'education._id': educationObjectId,
       },
       { $set: setFields },
       { new: true },
@@ -119,13 +120,14 @@ export class EducationService {
 
   async deleteEducation(userId: string, educationId: string) {
     const userObjectId = this.toUserObjectId(userId);
+    const educationObjectId = new Types.ObjectId(educationId);
 
     const updated = await this.educationModel.findOneAndUpdate(
       {
         userId: userObjectId,
-        'education._id': educationId,
+        'education._id': educationObjectId,
       },
-      { $pull: { education: { _id: educationId } } },
+      { $pull: { education: { _id: educationObjectId } } },
       { new: true },
     );
 
@@ -222,11 +224,12 @@ export class EducationService {
     }
 
     const userObjectId = this.toUserObjectId(userId);
+    const educationObjectId = new Types.ObjectId(educationId);
 
     const updated = await this.educationModel.findOneAndUpdate(
       {
         userId: userObjectId,
-        'education._id': educationId,
+        'education._id': educationObjectId,
       },
       { $unset: { [`education.$.${lang}`]: '' } },
       { new: true },
@@ -272,11 +275,12 @@ export class EducationService {
     }
 
     const userObjectId = this.toUserObjectId(userId);
+    const educationObjectId = new Types.ObjectId(educationId);
 
     const updated = await this.educationModel.findOneAndUpdate(
       {
         userId: userObjectId,
-        'education._id': educationId,
+        'education._id': educationObjectId,
       },
       { $unset: { [`education.$.${field}`]: '' } },
       { new: true },
@@ -296,11 +300,12 @@ export class EducationService {
     value: unknown,
   ) {
     const userObjectId = this.toUserObjectId(userId);
+    const educationObjectId = new Types.ObjectId(educationId);
 
     const updated = await this.educationModel.findOneAndUpdate(
       {
         userId: userObjectId,
-        'education._id': educationId,
+        'education._id': educationObjectId,
       },
       { $set: { [`education.$.${field}`]: value } },
       { new: true },
@@ -315,11 +320,12 @@ export class EducationService {
 
   private async getEntryOrThrow(userId: string, educationId: string) {
     const userObjectId = this.toUserObjectId(userId);
+    const educationObjectId = new Types.ObjectId(educationId);
 
     const doc = await this.educationModel
       .findOne({
         userId: userObjectId,
-        'education._id': educationId,
+        'education._id': educationObjectId,
       })
       .lean();
 
@@ -327,7 +333,9 @@ export class EducationService {
       throw new NotFoundException('Education entry not found');
     }
 
-    const entry = doc.education.find((e) => e._id === educationId);
+    const entry = doc.education.find(
+      (e) => e._id?.toString() === educationId,
+    );
     if (!entry) {
       throw new NotFoundException('Education entry not found');
     }
@@ -336,7 +344,7 @@ export class EducationService {
   }
 
   private findEntryInDoc(entries: EducationContent[], educationId: string) {
-    return entries.find((e) => e._id === educationId);
+    return entries.find((e) => e._id?.toString() === educationId);
   }
 
   private toUserObjectId(userId: string) {

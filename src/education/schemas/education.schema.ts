@@ -10,11 +10,11 @@ export type EducationDocument = Education & Document;
 
 @Schema()
 export class EducationContent {
-  @Prop() _id: string;
+  _id: Types.ObjectId;
 
   @Prop() url?: string;
 
-  [lang: string]: string | EducationLocalizedContent | undefined;
+  [lang: string]: string | Types.ObjectId | EducationLocalizedContent | undefined;
 }
 
 export const EducationContentSchema =
