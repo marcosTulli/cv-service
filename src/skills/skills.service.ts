@@ -73,10 +73,12 @@ export class SkillsService {
       throw new BadRequestException('No fields to update');
     }
 
+    const skillObjectId = new Types.ObjectId(skillId);
+
     const updated = await this.skillsModel.findOneAndUpdate(
       {
         userId: userObjectId,
-        'skills._id': skillId,
+        'skills._id': skillObjectId,
       },
       { $set: setFields },
       { new: true },
@@ -91,13 +93,14 @@ export class SkillsService {
 
   async deleteSkill(userId: string, skillId: string) {
     const userObjectId = this.toUserObjectId(userId);
+    const skillObjectId = new Types.ObjectId(skillId);
 
     const updated = await this.skillsModel.findOneAndUpdate(
       {
         userId: userObjectId,
-        'skills._id': skillId,
+        'skills._id': skillObjectId,
       },
-      { $pull: { skills: { _id: skillId } } },
+      { $pull: { skills: { _id: skillObjectId } } },
       { new: true },
     );
 
@@ -187,10 +190,12 @@ export class SkillsService {
 
     const userObjectId = this.toUserObjectId(userId);
 
+    const skillObjectId = new Types.ObjectId(skillId);
+
     const updated = await this.skillsModel.findOneAndUpdate(
       {
         userId: userObjectId,
-        'skills._id': skillId,
+        'skills._id': skillObjectId,
       },
       { $unset: { [`skills.$.${field}`]: '' } },
       { new: true },
@@ -211,10 +216,12 @@ export class SkillsService {
   ) {
     const userObjectId = this.toUserObjectId(userId);
 
+    const skillObjectId = new Types.ObjectId(skillId);
+
     const updated = await this.skillsModel.findOneAndUpdate(
       {
         userId: userObjectId,
-        'skills._id': skillId,
+        'skills._id': skillObjectId,
       },
       { $set: { [`skills.$.${field}`]: value } },
       { new: true },
@@ -230,10 +237,12 @@ export class SkillsService {
   private async getSkillOrThrow(userId: string, skillId: string) {
     const userObjectId = this.toUserObjectId(userId);
 
+    const skillObjectId = new Types.ObjectId(skillId);
+
     const doc = await this.skillsModel
       .findOne({
         userId: userObjectId,
-        'skills._id': skillId,
+        'skills._id': skillObjectId,
       })
       .lean();
 
@@ -241,7 +250,7 @@ export class SkillsService {
       throw new NotFoundException('Skill not found');
     }
 
-    const skill = doc.skills.find((s) => s._id === skillId);
+    const skill = doc.skills.find((s) => s._id?.toString() === skillId);
     if (!skill) {
       throw new NotFoundException('Skill not found');
     }
@@ -250,7 +259,7 @@ export class SkillsService {
   }
 
   private findSkillInDoc(skills: SkillsContent[], skillId: string) {
-    return skills.find((s) => s._id === skillId);
+    return skills.find((s) => s._id?.toString() === skillId);
   }
 
   private toUserObjectId(userId: string) {
