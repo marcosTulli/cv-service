@@ -41,22 +41,24 @@ export class SkillsService {
 
   async createSkill(userId: string, dto: CreateSkillDto) {
     const userObjectId = this.toUserObjectId(userId);
-    const skill: SkillsContent = {
-      _id: new Types.ObjectId().toString(),
-      name: dto.name,
-      formattedName: dto.formattedName,
-    };
+    const skillId = new Types.ObjectId();
 
     const updated = await this.skillsModel.findOneAndUpdate(
       { userId: userObjectId },
       {
-        $push: { skills: skill },
+        $push: {
+          skills: {
+            _id: skillId,
+            name: dto.name,
+            formattedName: dto.formattedName,
+          },
+        },
         $setOnInsert: { _id: new Types.ObjectId().toString() },
       },
       { new: true, upsert: true },
     );
 
-    return this.findSkillInDoc(updated.skills, skill._id);
+    return this.findSkillInDoc(updated.skills, skillId.toString());
   }
 
   async updateSkill(userId: string, skillId: string, dto: UpdateSkillDto) {

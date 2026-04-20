@@ -5,7 +5,7 @@ export type SkillsDocument = Skills & Document;
 
 @Schema()
 export class SkillsContent {
-  @Prop() _id: string;
+  _id: Types.ObjectId;
   @Prop() name: string;
   @Prop() formattedName: string;
 }
