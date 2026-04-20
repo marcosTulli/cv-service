@@ -8,13 +8,17 @@ export type EducationLocalizedContent = {
 
 export type EducationDocument = Education & Document;
 
-@Schema()
+@Schema({ strict: false })
 export class EducationContent {
   _id: Types.ObjectId;
 
   @Prop() url?: string;
 
-  [lang: string]: string | Types.ObjectId | EducationLocalizedContent | undefined;
+  [lang: string]:
+    | string
+    | Types.ObjectId
+    | EducationLocalizedContent
+    | undefined;
 }
 
 export const EducationContentSchema =

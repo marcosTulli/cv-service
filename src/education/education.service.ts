@@ -138,32 +138,12 @@ export class EducationService {
     return { success: true };
   }
 
-  async createUrl(
-    userId: string,
-    educationId: string,
-    dto: EducationUrlDto,
-  ) {
-    return this.setEntryField(
-      userId,
-      educationId,
-      'url',
-      dto.url,
-      'create',
-    );
+  async createUrl(userId: string, educationId: string, dto: EducationUrlDto) {
+    return this.setEntryField(userId, educationId, 'url', dto.url, 'create');
   }
 
-  async updateUrl(
-    userId: string,
-    educationId: string,
-    dto: EducationUrlDto,
-  ) {
-    return this.setEntryField(
-      userId,
-      educationId,
-      'url',
-      dto.url,
-      'update',
-    );
+  async updateUrl(userId: string, educationId: string, dto: EducationUrlDto) {
+    return this.setEntryField(userId, educationId, 'url', dto.url, 'update');
   }
 
   async deleteUrl(userId: string, educationId: string) {
@@ -211,11 +191,7 @@ export class EducationService {
     return this.writeEntryField(userId, educationId, lang, merged);
   }
 
-  async deleteTranslation(
-    userId: string,
-    educationId: string,
-    lang: string,
-  ) {
+  async deleteTranslation(userId: string, educationId: string, lang: string) {
     this.assertLang(lang);
     const entry = await this.getEntryOrThrow(userId, educationId);
 
@@ -333,9 +309,7 @@ export class EducationService {
       throw new NotFoundException('Education entry not found');
     }
 
-    const entry = doc.education.find(
-      (e) => e._id?.toString() === educationId,
-    );
+    const entry = doc.education.find((e) => e._id?.toString() === educationId);
     if (!entry) {
       throw new NotFoundException('Education entry not found');
     }
