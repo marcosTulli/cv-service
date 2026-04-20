@@ -39,6 +39,7 @@ export class AuthService {
     return this.signToken({
       userId: createdUser._id.toString(),
       email: createdUser.email,
+      role: createdUser.role,
     });
   }
 
@@ -80,6 +81,7 @@ export class AuthService {
     return this.signToken({
       userId: user._id.toString(),
       email: user.email,
+      role: user.role,
     });
   }
 

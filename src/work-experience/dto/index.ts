@@ -146,6 +146,33 @@ export class UpdateExperienceDto {
   info?: Record<string, ExperienceInfoDto>;
 }
 
+export class CreateExperienceInfoDto {
+  @ApiProperty()
+  @IsString()
+  position: string;
+
+  @ApiPropertyOptional({ type: [TaskDto] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TaskDto)
+  tasks?: TaskDto[];
+}
+
+export class UpdateExperienceInfoDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  position?: string;
+
+  @ApiPropertyOptional({ type: [TaskDto] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TaskDto)
+  tasks?: TaskDto[];
+}
+
 export class CompanyNameDto {
   @ApiProperty()
   @IsString()

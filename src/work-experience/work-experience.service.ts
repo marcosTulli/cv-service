@@ -18,6 +18,9 @@ import {
   ComapnyUrlDto,
   ActivePeriodDto,
   UpdateActivePeriodDto,
+  CreateExperienceInfoDto,
+  UpdateExperienceInfoDto,
+  TaskDto,
 } from './dto';
 
 @Injectable()
@@ -222,6 +225,231 @@ export class WorkExperienceService {
 
   async deleteActivePeriod(userId: string, experienceId: string) {
     return this.unsetExperienceField(userId, experienceId, 'activePeriod');
+  }
+
+  // ── ExperienceInfo (per language) ──
+
+  async createExperienceInfo(
+    userId: string,
+    experienceId: string,
+    lang: string,
+    dto: CreateExperienceInfoDto,
+  ) {
+    const experience = await this.getExperienceOrThrow(userId, experienceId);
+    const existing = experience.info?.[lang];
+
+    if (existing) {
+      throw new ConflictException(`Info for language "${lang}" already set`);
+    }
+
+    const userObjectId = this.toUserObjectId(userId);
+    const experienceObjectId = this.toExperienceObjectId(experienceId);
+
+    const updated = await this.workExperienceModel.findOneAndUpdate(
+      { userId: userObjectId, 'experiences._id': experienceObjectId },
+      {
+        $set: {
+          [`experiences.$.info.${lang}`]: {
+            position: dto.position,
+            tasks: dto.tasks ?? [],
+          },
+        },
+      },
+      { new: true },
+    );
+
+    if (!updated) {
+      throw new NotFoundException('Experience not found');
+    }
+
+    return this.findExperienceInDoc(updated, experienceId);
+  }
+
+  async updateExperienceInfo(
+    userId: string,
+    experienceId: string,
+    lang: string,
+    dto: UpdateExperienceInfoDto,
+  ) {
+    const experience = await this.getExperienceOrThrow(userId, experienceId);
+    const existing = experience.info?.[lang];
+
+    if (!existing) {
+      throw new NotFoundException(`Info for language "${lang}" not set`);
+    }
+
+    const userObjectId = this.toUserObjectId(userId);
+    const experienceObjectId = this.toExperienceObjectId(experienceId);
+
+    const setFields: Record<string, unknown> = {};
+    if (dto.position !== undefined) {
+      setFields[`experiences.$.info.${lang}.position`] = dto.position;
+    }
+    if (dto.tasks !== undefined) {
+      setFields[`experiences.$.info.${lang}.tasks`] = dto.tasks;
+    }
+
+    if (Object.keys(setFields).length === 0) {
+      throw new BadRequestException('No fields to update');
+    }
+
+    const updated = await this.workExperienceModel.findOneAndUpdate(
+      { userId: userObjectId, 'experiences._id': experienceObjectId },
+      { $set: setFields },
+      { new: true },
+    );
+
+    if (!updated) {
+      throw new NotFoundException('Experience not found');
+    }
+
+    return this.findExperienceInDoc(updated, experienceId);
+  }
+
+  async deleteExperienceInfo(
+    userId: string,
+    experienceId: string,
+    lang: string,
+  ) {
+    const experience = await this.getExperienceOrThrow(userId, experienceId);
+
+    if (!experience.info?.[lang]) {
+      throw new NotFoundException(`Info for language "${lang}" not set`);
+    }
+
+    const userObjectId = this.toUserObjectId(userId);
+    const experienceObjectId = this.toExperienceObjectId(experienceId);
+
+    const updated = await this.workExperienceModel.findOneAndUpdate(
+      { userId: userObjectId, 'experiences._id': experienceObjectId },
+      { $unset: { [`experiences.$.info.${lang}`]: '' } },
+      { new: true },
+    );
+
+    if (!updated) {
+      throw new NotFoundException('Experience not found');
+    }
+
+    return { success: true };
+  }
+
+  // ── Tasks (within a language's info) ──
+
+  async addTask(
+    userId: string,
+    experienceId: string,
+    lang: string,
+    dto: TaskDto,
+  ) {
+    const experience = await this.getExperienceOrThrow(userId, experienceId);
+
+    if (!experience.info?.[lang]) {
+      throw new NotFoundException(`Info for language "${lang}" not set`);
+    }
+
+    const userObjectId = this.toUserObjectId(userId);
+    const experienceObjectId = this.toExperienceObjectId(experienceId);
+
+    const updated = await this.workExperienceModel.findOneAndUpdate(
+      { userId: userObjectId, 'experiences._id': experienceObjectId },
+      { $push: { [`experiences.$.info.${lang}.tasks`]: dto } },
+      { new: true },
+    );
+
+    if (!updated) {
+      throw new NotFoundException('Experience not found');
+    }
+
+    return this.findExperienceInDoc(updated, experienceId);
+  }
+
+  async updateTask(
+    userId: string,
+    experienceId: string,
+    lang: string,
+    taskId: string,
+    dto: TaskDto,
+  ) {
+    const experience = await this.getExperienceOrThrow(userId, experienceId);
+    const info = experience.info?.[lang];
+
+    if (!info) {
+      throw new NotFoundException(`Info for language "${lang}" not set`);
+    }
+
+    const taskExists = info.tasks?.some(
+      (t) => (t as unknown as { _id?: Types.ObjectId })._id?.toString() === taskId,
+    );
+
+    if (!taskExists) {
+      throw new NotFoundException('Task not found');
+    }
+
+    if (!Types.ObjectId.isValid(taskId)) {
+      throw new BadRequestException('Invalid taskId');
+    }
+
+    const userObjectId = this.toUserObjectId(userId);
+    const experienceObjectId = this.toExperienceObjectId(experienceId);
+
+    const updated = await this.workExperienceModel.findOneAndUpdate(
+      { userId: userObjectId, 'experiences._id': experienceObjectId },
+      { $set: { [`experiences.$.info.${lang}.tasks.$[t].task`]: dto.task } },
+      { new: true, arrayFilters: [{ 't._id': new Types.ObjectId(taskId) }] },
+    );
+
+    if (!updated) {
+      throw new NotFoundException('Experience not found');
+    }
+
+    return this.findExperienceInDoc(updated, experienceId);
+  }
+
+  async deleteTask(
+    userId: string,
+    experienceId: string,
+    lang: string,
+    taskId: string,
+  ) {
+    const experience = await this.getExperienceOrThrow(userId, experienceId);
+    const info = experience.info?.[lang];
+
+    if (!info) {
+      throw new NotFoundException(`Info for language "${lang}" not set`);
+    }
+
+    if (!Types.ObjectId.isValid(taskId)) {
+      throw new BadRequestException('Invalid taskId');
+    }
+
+    const taskExists = info.tasks?.some(
+      (t) => (t as unknown as { _id?: Types.ObjectId })._id?.toString() === taskId,
+    );
+
+    if (!taskExists) {
+      throw new NotFoundException('Task not found');
+    }
+
+    const userObjectId = this.toUserObjectId(userId);
+    const experienceObjectId = this.toExperienceObjectId(experienceId);
+
+    const updated = await this.workExperienceModel.findOneAndUpdate(
+      { userId: userObjectId, 'experiences._id': experienceObjectId },
+      {
+        $pull: {
+          [`experiences.$.info.${lang}.tasks`]: {
+            _id: new Types.ObjectId(taskId),
+          },
+        },
+      },
+      { new: true },
+    );
+
+    if (!updated) {
+      throw new NotFoundException('Experience not found');
+    }
+
+    return { success: true };
   }
 
   private async setExperienceField(

@@ -15,8 +15,11 @@ import {
   CompanyNameDto,
   ComapnyUrlDto,
   CreateExperienceDto,
+  CreateExperienceInfoDto,
+  TaskDto,
   UpdateActivePeriodDto,
   UpdateExperienceDto,
+  UpdateExperienceInfoDto,
   WorkExperienceDto,
 } from './dto';
 
@@ -147,5 +150,75 @@ export class WorkExperienceController {
     @Param('experienceId') experienceId: string,
   ) {
     return this.service.deleteActivePeriod(userId, experienceId);
+  }
+
+  // ── ExperienceInfo (per language) ──
+
+  @OwnerOnly()
+  @Post(':userId/experiences/:experienceId/info/:lang')
+  async createExperienceInfo(
+    @Param('userId') userId: string,
+    @Param('experienceId') experienceId: string,
+    @Param('lang') lang: string,
+    @Body() dto: CreateExperienceInfoDto,
+  ) {
+    return this.service.createExperienceInfo(userId, experienceId, lang, dto);
+  }
+
+  @OwnerOnly()
+  @Patch(':userId/experiences/:experienceId/info/:lang')
+  async updateExperienceInfo(
+    @Param('userId') userId: string,
+    @Param('experienceId') experienceId: string,
+    @Param('lang') lang: string,
+    @Body() dto: UpdateExperienceInfoDto,
+  ) {
+    return this.service.updateExperienceInfo(userId, experienceId, lang, dto);
+  }
+
+  @OwnerOnly()
+  @Delete(':userId/experiences/:experienceId/info/:lang')
+  async deleteExperienceInfo(
+    @Param('userId') userId: string,
+    @Param('experienceId') experienceId: string,
+    @Param('lang') lang: string,
+  ) {
+    return this.service.deleteExperienceInfo(userId, experienceId, lang);
+  }
+
+  // ── Tasks ──
+
+  @OwnerOnly()
+  @Post(':userId/experiences/:experienceId/info/:lang/tasks')
+  async addTask(
+    @Param('userId') userId: string,
+    @Param('experienceId') experienceId: string,
+    @Param('lang') lang: string,
+    @Body() dto: TaskDto,
+  ) {
+    return this.service.addTask(userId, experienceId, lang, dto);
+  }
+
+  @OwnerOnly()
+  @Patch(':userId/experiences/:experienceId/info/:lang/tasks/:taskId')
+  async updateTask(
+    @Param('userId') userId: string,
+    @Param('experienceId') experienceId: string,
+    @Param('lang') lang: string,
+    @Param('taskId') taskId: string,
+    @Body() dto: TaskDto,
+  ) {
+    return this.service.updateTask(userId, experienceId, lang, taskId, dto);
+  }
+
+  @OwnerOnly()
+  @Delete(':userId/experiences/:experienceId/info/:lang/tasks/:taskId')
+  async deleteTask(
+    @Param('userId') userId: string,
+    @Param('experienceId') experienceId: string,
+    @Param('lang') lang: string,
+    @Param('taskId') taskId: string,
+  ) {
+    return this.service.deleteTask(userId, experienceId, lang, taskId);
   }
 }
